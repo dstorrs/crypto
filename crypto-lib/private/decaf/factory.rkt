@@ -19,7 +19,7 @@
          "../common/common.rkt"
          "../common/factory.rkt"
          "ffi.rkt"
-         ;;"digest.rkt"
+         "digest.rkt"
          "pkey.rkt")
 (provide decaf-factory)
 
@@ -30,6 +30,12 @@
 
     (define/override (get-name) 'decaf)
     (define/override (get-version) '())
+
+    (define/override (-get-digest info)
+      (case (send info get-spec)
+        [(sha512)
+         (new decaf-sha512-impl% (info info) (factory this))]
+        [else #f]))
 
     (define/override (-get-pk spec)
       (case spec

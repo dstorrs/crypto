@@ -103,11 +103,7 @@
       (decaf_ed25519_sign priv pub msg (bytes-length msg) 0))
 
     (define/override (-verify msg _dspec pad sig)
-      (unless (= (bytes-length sig) DECAF_EDDSA_25519_SIGNATURE_BYTES)
-        (crypto-error
-         "wrong size for signature\n  expected: ~s bytes\n  given: ~s bytes\n  for: ~a"
-         DECAF_EDDSA_25519_SIGNATURE_BYTES (bytes-length sig) (about)))
-      ;; FIXME: check sig length!
+      (check-bytes-length "signature" sig DECAF_EDDSA_25519_SIGNATURE_BYTES this)
       (decaf_ed25519_verify sig pub msg (bytes-length msg) 0))
     ))
 

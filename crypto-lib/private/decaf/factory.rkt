@@ -45,8 +45,8 @@
     (define/override (info key)
       (case key
         [(all-ec-curves) '()]
-        [(all-eddsa-curves) '(ed25519)]
-        [(all-ecx-curves) '(x25519)]
+        [(all-eddsa-curves) '(ed25519 ed448)]
+        [(all-ecx-curves) '(x25519 x448)]
         [else (super info key)]))
 
     (define/override (print-info)

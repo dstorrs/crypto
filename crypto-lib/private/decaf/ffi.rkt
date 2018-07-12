@@ -146,3 +146,95 @@
         -> _void -> out))
 
 ;; ============================================================
+
+
+
+
+
+
+
+;; ============================================================
+;; ed448
+
+;; Number of bytes in an EdDSA public key.
+(define DECAF_EDDSA_448_PUBLIC_BYTES 57)
+
+;; Number of bytes in an EdDSA private key.
+(define DECAF_EDDSA_448_PRIVATE_BYTES DECAF_EDDSA_448_PUBLIC_BYTES)
+
+;; Number of bytes in an EdDSA private key.
+(define DECAF_EDDSA_448_SIGNATURE_BYTES
+  (+ DECAF_EDDSA_448_PUBLIC_BYTES DECAF_EDDSA_448_PRIVATE_BYTES))
+
+;; EdDSA key generation.  This function uses a different (non-Decaf) encoding.
+(define-decaf decaf_ed448_derive_public_key
+  (_fun (pub  : _bytes = (make-bytes DECAF_EDDSA_448_PUBLIC_BYTES))
+        (priv : _pointer) ;; DECAF_EDDSA_448_PRIVATE_BYTES
+        -> _void -> pub))
+
+;; EdDSA signing.
+(define-decaf decaf_ed448_sign
+  (_fun (sig : _bytes = (make-bytes DECAF_EDDSA_448_SIGNATURE_BYTES))
+        (priv : _pointer)
+        (pub  : _pointer)
+        (msg : _pointer) (mlen : _size)
+        (ph? : _uint8)
+        (ctx : _pointer = #f) (ctxlen : _uint8 = 0)
+        -> _void -> sig))
+
+;; EdDSA signature verification.
+(define-decaf decaf_ed448_verify
+  (_fun (sig : _pointer)
+        (pub : _pointer)
+        (msg : _pointer) (mlen : _size)
+        (ph? : _uint8)
+        (ctx : _pointer = #f) (ctxlen : _uint8 = 0)
+        -> (err : _decaf_error) -> (decaf-ok? err)))
+
+;; EdDSA to ECDH public key conversion: Deserialize the point to get y
+;; on Edwards curve, convert it to u coordinate on Montgomery curve.
+;; WARNING: This function does not check that the public key being converted
+;; is a valid EdDSA public key (FUTURE?)
+(define-decaf decaf_ed448_convert_public_key_to_x448
+  (_fun (xpub  : _bytes = (make-bytes DECAF_X448_PUBLIC_BYTES))
+        (edpub : _pointer)
+        -> _void -> xpub))
+
+;; EdDSA to ECDH private key conversion: Using the appropriate hash
+;; function, hash the EdDSA private key and keep only the lower bytes
+;; to get the ECDH private key.
+(define-decaf decaf_ed448_convert_private_key_to_x448
+  (_fun (xpriv  : _bytes = (make-bytes DECAF_X448_PRIVATE_BYTES))
+        (edpriv : _pointer)
+        -> _void -> xpriv))
+
+
+;; ============================================================
+;; x448
+
+;; Number of bytes in an x448 public key
+(define DECAF_X448_PUBLIC_BYTES 56)
+
+;; Number of bytes in an x448 private key
+(define DECAF_X448_PRIVATE_BYTES 56)
+
+;; RFC 7748 Diffie-Hellman scalarmul, used to compute shared secrets.
+;; This function uses a different (non-Decaf) encoding.
+(define-decaf decaf_x448
+  (_fun (out : _bytes = (make-bytes DECAF_X448_PUBLIC_BYTES))
+        (base : _bytes) ;; DECAF_X448_PUBLIC_BYTES
+        (scalar : _bytes) ;; DECAF_X448_PRIVATE_BYTES
+        -> (s : _decaf_error) -> (and (decaf-ok? s) out)))
+
+;; The base point for X448 Diffie-Hellman
+(define-decaf decaf_x448_base_point _pointer #:fail (K #f))
+;; extern const uint8_t decaf_x448_base_point[DECAF_X448_PUBLIC_BYTES];
+
+;; RFC 7748 Diffie-Hellman base point scalarmul.  This function uses a
+;; different (non-Decaf) encoding.
+(define-decaf decaf_x448_derive_public_key
+  (_fun (out : _bytes = (make-bytes DECAF_X448_PUBLIC_BYTES))
+        (scalar : _pointer) ;; DECAF_X448_PRIVATE_BYTES
+        -> _void -> out))
+
+;; ============================================================

@@ -205,7 +205,7 @@
     (define/override (get-params)
       (send impl curve->params (get-curve)))
     (define/override (get-public-key)
-      (if priv (send impl make-public-key (get-curve pub)) this))
+      (if priv (send impl make-public-key (get-curve) pub) this))
     (define/override (-write-public-key fmt)
       (encode-pub-ecx fmt (get-curve) pub))
     (define/override (-write-private-key fmt)
